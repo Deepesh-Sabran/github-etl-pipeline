@@ -5,8 +5,9 @@ SEARCH_REPO_URL = "/search/repositories"
 TIMEOUT = 30
 
 PARAMS = {
-    "q": "language:python",
-    "sort": "desc",
+    "q": "is:public",
+    "sort": "stars",
+    "order": "desc",
     "page": 1,
     "per_page": 100
 }

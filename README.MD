@@ -1,6 +1,26 @@
+# GitHub ETL Pipeline
+
+An end-to-end ETL (Extract, Transform, Load) pipeline built in Python that fetches trending GitHub repository data, transforms it into an analytics-friendly format, and generates business reports.
+
+---
+
+# Project Overview
+
+The analytics team requires daily reports to understand GitHub repository trends.
+
+This pipeline automatically:
+
+- Fetches repository data from the GitHub REST API
+- Stores the raw JSON response
+- Transforms nested JSON into a flat tabular format
+- Generates business reports
+- Maintains execution logs
+
+---
+
 # Business Requirement
 
-## Make an automation pipeline for my analytics team report that should answer question like:
+Generate reports that answer the following questions:
 
 1. Which programming languages are trending?
 2. Which repositories are getting the most stars?
@@ -8,39 +28,245 @@
 4. How many repositories were created each day?
 5. Which repositories crossed 1000 stars?
 
-## Data Required:
+---
 
-| Fields | Why it's needed |
-| :--- | :--- |
-| **languages** | To know name of programming languages |
-| **language % in each repo** | To check language trend |
-| **repository** | To know name of repository |
-| **stars_count** | To keep track for stars on each repo |
-| **owner_name** | To know name of repo owners |
-| **created_at** | To know when a repo is created (Date, Time) |
+# GitHub API
 
+**Endpoint**
 
-## Possible GitHub Endpoint:
+```
+GET /search/repositories
+```
 
-1. GET /search/repositories
-    GET /search/repositories needs:
+Current query parameters:
 
-    q required
-    Optional headers:
-    Accept: application/vnd.github+json
-    Optional query parameters:
+```python
+PARAMS = {
+    "q": "is:public",
+    "sort": "stars",
+    "order": "desc",
+    "page": 1,
+    "per_page": 100
+}
+```
 
-    sort
-    stars
-    forks
-    help-wanted-issues
-    updated
-    order
-    desc
-    asc
-    per_page
-    max 100
-    page
+---
 
-# Final Output:
-Every morning 9:00 AM a new report should be triggered to Team members via mail.
+# Project Structure
+
+```
+github-etl/
+│
+├── config/
+│   └── config.py
+│
+├── extract/
+│   └── github_extract.py
+│
+├── transform/
+│   └── github_transform.py
+│
+├── report/
+│   └── github_report.py
+│
+├── utils/
+│   ├── logger.py
+│   ├── save_json.py
+│   └── save_csv.py
+│
+├── data/
+│   ├── raw/
+│   └── processed/
+│
+├── reports/
+│
+├── logs/
+│
+├── main.py
+│
+└── README.md
+```
+
+---
+
+# ETL Workflow
+
+```
+GitHub API
+      │
+      ▼
+Extract
+      │
+      ▼
+Raw JSON
+(data/raw)
+      │
+      ▼
+Transform
+(json_normalize)
+      │
+      ▼
+Processed CSV
+(data/processed)
+      │
+      ▼
+Generate Reports
+      │
+      ▼
+reports/
+      │
+      ▼
+Execution Logs
+(logs/)
+```
+
+---
+
+# Generated Reports
+
+The pipeline generates the following reports:
+
+- Trending Programming Languages
+- Top Starred Repositories
+- Top Repository Owners
+- Repositories Created Each Day
+- Repositories With More Than 1000 Stars
+
+---
+
+# Output
+
+## Raw Data
+
+```
+data/raw/
+```
+
+Stores the original GitHub API response in JSON format.
+
+Example:
+
+```
+github_2026-07-02.json
+```
+
+---
+
+## Processed Data
+
+```
+data/processed/
+```
+
+Stores the flattened repository dataset in CSV format.
+
+Example:
+
+```
+github_2026-07-02.csv
+```
+
+---
+
+## Reports
+
+```
+reports/
+```
+
+Example:
+
+```
+github_trending_languages_2026-07-02.csv
+
+github_top_repositories_2026-07-02.csv
+
+github_top_owners_2026-07-02.csv
+
+github_repositories_created_each_day_2026-07-02.csv
+
+github_repositories_above_1000_stars_2026-07-02.csv
+```
+
+---
+
+## Logs
+
+```
+logs/
+```
+
+Example:
+
+```
+github_2026-07-02.log
+```
+
+Sample:
+
+```
+Pipeline started.
+Data fetched successfully.
+Raw JSON saved.
+Processed CSV saved.
+Reports generated successfully.
+Pipeline completed.
+```
+
+---
+
+# Technologies Used
+
+- Python 3
+- Requests
+- Pandas
+- Pathlib
+- Datetime
+- GitHub REST API
+
+---
+
+# How to Run
+
+Clone the repository
+
+```bash
+git clone <repository-url>
+```
+
+Navigate into the project
+
+```bash
+cd github-etl
+```
+
+Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+Run the pipeline
+
+```bash
+python main.py
+```
+
+---
+
+# Future Improvements
+
+- Schedule pipeline execution using Cron or Airflow
+- Load processed data into PostgreSQL
+- Send reports automatically via email
+- Dockerize the application
+- Add unit tests
+- CI/CD using GitHub Actions
+
+---
+
+# Author
+
+**Deepesh Sabran**
+
+Built to demonstrate ETL pipeline development using Python, Pandas, and the GitHub REST API.
