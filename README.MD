@@ -1,26 +1,27 @@
-# GitHub ETL Pipeline
+# GitHub Analytics ETL Pipeline
 
-An end-to-end ETL (Extract, Transform, Load) pipeline built in Python that fetches trending GitHub repository data, transforms it into an analytics-friendly format, and generates business reports.
+An automated ETL pipeline that extracts trending GitHub repository data, transforms it into a clean dataset, generates business reports, and emails them automatically every day.
 
 ---
 
-# Project Overview
+## Project Overview
 
-The analytics team requires daily reports to understand GitHub repository trends.
+This project was built to automate the daily reporting process for an Analytics Team.
 
-This pipeline automatically:
+Instead of manually downloading GitHub data and creating reports, the pipeline:
 
-- Fetches repository data from the GitHub REST API
-- Stores the raw JSON response
-- Transforms nested JSON into a flat tabular format
-- Generates business reports
-- Maintains execution logs
+- Fetches latest GitHub repositories
+- Cleans & transforms the data
+- Generates multiple business reports
+- Stores raw & processed datasets
+- Emails reports automatically
+- Runs every day at 11:00 AM using Cron
 
 ---
 
 # Business Requirement
 
-Generate reports that answer the following questions:
+The Analytics Team wants daily reports answering the following questions:
 
 1. Which programming languages are trending?
 2. Which repositories are getting the most stars?
@@ -30,25 +31,15 @@ Generate reports that answer the following questions:
 
 ---
 
-# GitHub API
+# Tech Stack
 
-**Endpoint**
-
-```
-GET /search/repositories
-```
-
-Current query parameters:
-
-```python
-PARAMS = {
-    "q": "is:public",
-    "sort": "stars",
-    "order": "desc",
-    "page": 1,
-    "per_page": 100
-}
-```
+- Python
+- Pandas
+- Requests
+- Pathlib
+- Resend API
+- Cron (macOS)
+- dotenv
 
 ---
 
@@ -58,32 +49,21 @@ PARAMS = {
 github-etl/
 │
 ├── config/
-│   └── config.py
-│
 ├── extract/
-│   └── github_extract.py
-│
 ├── transform/
-│   └── github_transform.py
-│
 ├── report/
-│   └── github_report.py
-│
+├── email/
 ├── utils/
-│   ├── logger.py
-│   ├── save_json.py
-│   └── save_csv.py
 │
 ├── data/
 │   ├── raw/
 │   └── processed/
 │
 ├── reports/
-│
 ├── logs/
 │
 ├── main.py
-│
+├── requirements.txt
 └── README.md
 ```
 
@@ -95,158 +75,84 @@ github-etl/
 GitHub API
       │
       ▼
-Extract
+Extract Data
       │
       ▼
-Raw JSON
-(data/raw)
+Save Raw JSON
       │
       ▼
-Transform
-(json_normalize)
+Transform Data
       │
       ▼
-Processed CSV
-(data/processed)
+Save Processed CSV
       │
       ▼
-Generate Reports
+Generate Business Reports
       │
       ▼
-reports/
+Email Reports
       │
       ▼
-Execution Logs
-(logs/)
+Scheduled Daily using Cron
 ```
 
 ---
 
-# Generated Reports
+# Reports Generated
 
-The pipeline generates the following reports:
+Every execution generates the following reports:
 
 - Trending Programming Languages
 - Top Starred Repositories
 - Top Repository Owners
 - Repositories Created Each Day
-- Repositories With More Than 1000 Stars
+- Repositories Above 1000 Stars
 
 ---
 
-# Output
+# Features
 
-## Raw Data
-
-```
-data/raw/
-```
-
-Stores the original GitHub API response in JSON format.
-
-Example:
-
-```
-github_2026-07-02.json
-```
+- Extracts latest GitHub repositories
+- Stores raw JSON data
+- Creates cleaned dataset
+- Generates 5 analytical reports
+- Automatic logging
+- Environment variable support
+- Dynamic CSV attachments
+- Sends email automatically
+- Scheduled daily execution
 
 ---
 
-## Processed Data
+# Environment Variables
 
-```
-data/processed/
-```
+Create a `.env` file.
 
-Stores the flattened repository dataset in CSV format.
-
-Example:
-
-```
-github_2026-07-02.csv
+```env
+RESEND_API_KEY=your_api_key
+RESEND_FROM=onboarding@resend.dev
+RESEND_TO=your_email@gmail.com
 ```
 
 ---
 
-## Reports
-
-```
-reports/
-```
-
-Example:
-
-```
-github_trending_languages_2026-07-02.csv
-
-github_top_repositories_2026-07-02.csv
-
-github_top_owners_2026-07-02.csv
-
-github_repositories_created_each_day_2026-07-02.csv
-
-github_repositories_above_1000_stars_2026-07-02.csv
-```
-
----
-
-## Logs
-
-```
-logs/
-```
-
-Example:
-
-```
-github_2026-07-02.log
-```
-
-Sample:
-
-```
-Pipeline started.
-Data fetched successfully.
-Raw JSON saved.
-Processed CSV saved.
-Reports generated successfully.
-Pipeline completed.
-```
-
----
-
-# Technologies Used
-
-- Python 3
-- Requests
-- Pandas
-- Pathlib
-- Datetime
-- GitHub REST API
-
----
-
-# How to Run
-
-Clone the repository
+# Installation
 
 ```bash
-git clone <repository-url>
-```
+git clone https://github.com/yourusername/github-etl.git
 
-Navigate into the project
-
-```bash
 cd github-etl
-```
 
-Install dependencies
+python -m venv .venv
 
-```bash
+source .venv/bin/activate
+
 pip install -r requirements.txt
 ```
 
-Run the pipeline
+---
+
+# Run
 
 ```bash
 python main.py
@@ -254,14 +160,55 @@ python main.py
 
 ---
 
+# Cron Job
+
+Runs every day at **11:00 AM**
+
+```cron
+0 11 * * * cd /Users/apple/Desktop/github-etl && /Users/apple/Desktop/github-etl/.venv/bin/python main.py >> /Users/apple/Desktop/github-etl/logs/cron.log 2>&1
+```
+
+---
+
+# Screenshots
+
+## Generated Reports
+
+![alt text](image.png)
+---
+
+## Email Received
+
+![alt text](image-1.png)
+---
+
+## Logs
+
+![alt text](image-2.png)
+---
+
+# Sample Report
+
+| Language | Repository Count |
+|-----------|-----------------:|
+| JavaScript | 27 |
+| Java | 10 |
+| Ruby | 9 |
+| Python | 6 |
+| Go | 5 |
+
+---
+
 # Future Improvements
 
-- Schedule pipeline execution using Cron or Airflow
-- Load processed data into PostgreSQL
-- Send reports automatically via email
-- Dockerize the application
-- Add unit tests
-- CI/CD using GitHub Actions
+- Docker support
+- GitHub Actions CI/CD
+- Better exception handling
+- Unit testing
+- Cloud deployment
+- Multiple ETL pipelines
+- HTML email template
+- Dashboard integration
 
 ---
 
@@ -269,4 +216,4 @@ python main.py
 
 **Deepesh Sabran**
 
-Built to demonstrate ETL pipeline development using Python, Pandas, and the GitHub REST API.
+Built as part of an end-to-end Data Engineering learning journey.

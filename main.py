@@ -5,6 +5,7 @@ from utils.save_json import save_raw_json
 from transform.github_transform import transform_github_data
 from utils.save_csv import save_to_csv
 from report.github_report import generate_github_reports
+from mailer.send_email import send_reports
 
 write_log("github", "info", "Pipeline started.")
 
@@ -19,6 +20,8 @@ if data:
     write_log("github", "info", f"Successfully added required transformed data to {csv_file}.")
 
     generate_github_reports(transformed_df)
+
+    response = send_reports()
 
     write_log("github", "info", "Pipeline completed.")
 else:
